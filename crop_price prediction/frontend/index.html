@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Price Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ccc;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Crop Price Prediction</h2>
+        <input type="file" id="imageInput" accept="image/*">
+        <br>
+        <button onclick="predictCrop()" id="predictButton">Upload & Predict</button>
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        async function predictCrop() {
+            const fileInput = document.getElementById("imageInput");
+            const resultDiv = document.getElementById("result");
+            const button = document.getElementById("predictButton");
+
+            if (!fileInput.files.length) {
+                alert("Please select an image first.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            button.disabled = true;
+            button.textContent = "Predicting...";
+
+            try {
+                // Change this URL to your FastAPI backend endpoint (use ngrok URL if on Colab)
+                const response = await fetch("http://localhost:8000/predict", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `<b>Crop:</b> ${data.crop}<br>
+                                           <b>Market Price:</b> $${data.market_trend?.latest_price}<br>
+                                           <b>Demand Index:</b> ${data.market_trend?.demand_index}`;
+                    resultDiv.style.display = "block";
+                } else {
+                    resultDiv.innerHTML = `<b>Error:</b> ${data.error || "Failed to get prediction"}`;
+                    resultDiv.style.display = "block";
+                }
+            } catch (err) {
+                resultDiv.innerHTML = "<b>Error:</b> Unable to connect to server.";
+                resultDiv.style.display = "block";
+            } finally {
+                button.disabled = false;
+                button.textContent = "Upload & Predict";
+            }
+        }
+    </script>
+</body>
+</html>
