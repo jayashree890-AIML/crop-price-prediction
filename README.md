@@ -22,4 +22,17 @@ pip install pandas numpy tensorflow scikit-learn matplotlib
 Dataset
 
 daily_price.csv from kaggle 
-uploaded in backend folder 
+
+if not it is uploaded in backend folder 
+
+Contributions
+
+Jayashree P
+
+Brindaa C
+
+Nirmalashree M
+
+Raksha
+
+Lekhana BR
